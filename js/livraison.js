@@ -24,7 +24,7 @@ export function zonePour(codePostal) {
 export function fraisLivraison(codePostal, montant) {
   const zone = zonePour(codePostal);
   if (!zone) return null;
-  if (montant >= regles.seuilGratuite) return 0;
+  if (Math.round(montant * 100) >= Math.round(regles.seuilGratuite * 100)) return 0;
   return zone.frais;
 }
 
