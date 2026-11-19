@@ -13,8 +13,21 @@ export function sauverPanier(lignes, codePromo) {
 export function chargerPanier() {
   const brut = localStorage.getItem(CLE);
   if (!brut) {
-    return { lignes: [], codePromo: "" };
+    return { lignes: [], codePromo: "", sauvegardeProtegee: false };
   }
-  const donnees = JSON.parse(brut);
-  return { lignes: donnees.lignes || donnees, codePromo: donnees.codePromo || "" };
+  let donnees;
+  try {
+    donnees = JSON.parse(brut);
+  } catch (erreur) {
+    console.error("La sauvegarde du panier est illisible; les données sont conservées.", erreur);
+    return { lignes: [], codePromo: "", sauvegardeProtegee: true };
+  }
+  if (!donnees || donnees.version !== VERSION || !Array.isArray(donnees.lignes)) {
+    return { lignes: [], codePromo: "", sauvegardeProtegee: true };
+  }
+  return {
+    lignes: donnees.lignes,
+    codePromo: donnees.codePromo || "",
+    sauvegardeProtegee: false,
+  };
 }

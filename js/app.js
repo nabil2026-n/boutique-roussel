@@ -11,7 +11,7 @@ import { preparerComposition, ouvrirComposition } from "./composition.js";
 import { afficherCatalogue, afficherPanier, afficherJours, afficherMoments, afficherRecap } from "./affichage.js";
 
 // Ce que la cliente a saisi en dehors du panier.
-const etat = { codePromo: "", codePostal: "", catalogue: null };
+const etat = { codePromo: "", codePostal: "", catalogue: null, sauvegardeProtegee: false };
 
 // Lance la boutique.
 async function demarrer() {
@@ -28,6 +28,7 @@ async function demarrer() {
   const sauvegarde = chargerPanier();
   remplacerLignes(sauvegarde.lignes);
   etat.codePromo = sauvegarde.codePromo;
+  etat.sauvegardeProtegee = sauvegarde.sauvegardeProtegee;
 
   preparerFiltres(catalogue.occasions);
   afficherCatalogue(catalogue.bouquets, "toutes", ouvrirComposition);
@@ -68,6 +69,7 @@ function preparerFiltres(occasions) {
 // Un bouquet composé vient d'être ajouté.
 function quandAjoute(bouquetId, options) {
   ajouterAuPanier(bouquetId, options);
+  etat.sauvegardeProtegee = false;
   rafraichir();
 }
 
@@ -76,6 +78,7 @@ function quandActionPanier(action, index) {
   if (action === "plus") changerQuantite(index, 1);
   if (action === "moins") changerQuantite(index, -1);
   if (action === "supprimer") supprimerLigne(index);
+  etat.sauvegardeProtegee = false;
   rafraichir();
 }
 
@@ -106,7 +109,7 @@ function rafraichir() {
   }
   const frais = etat.codePostal.trim().length === 5 ? fraisLivraison(etat.codePostal, montant) : undefined;
   afficherRecap({ montant, remise, frais, total: totalCommande(montant, remise, frais) });
-  sauverPanier(lignes, etat.codePromo);
+  if (!etat.sauvegardeProtegee) sauverPanier(lignes, etat.codePromo);
 }
 
 // Le bouton « Commander » : vérifie la commande puis la confirme.
