@@ -38,9 +38,20 @@ function decrireOptions(options) {
   return morceaux.filter(Boolean).join(", ");
 }
 
+let listePanierEcoutee = null;
+let surActionPanierCourante = null;
+
+function gererClicPanier(evenement) {
+  const cible = evenement.target.closest("button[data-action]");
+  if (!cible) return;
+  surActionPanierCourante(cible.dataset.action, Number(cible.dataset.index));
+}
+
 // Affiche les lignes du panier avec leurs boutons.
 export function afficherPanier(lignes, surAction) {
   const liste = document.querySelector("#panier-liste");
+  surActionPanierCourante = surAction;
+
   liste.replaceChildren();
   document.querySelector("#panier-vide").hidden = lignes.length > 0;
 
@@ -65,12 +76,10 @@ export function afficherPanier(lignes, surAction) {
     liste.append(element);
   });
 
-  // Les boutons + , − et Supprimer de toutes les lignes.
-  liste.addEventListener("click", (evenement) => {
-    const cible = evenement.target.closest("button[data-action]");
-    if (!cible) return;
-    surAction(cible.dataset.action, Number(cible.dataset.index));
-  });
+  if (listePanierEcoutee !== liste) {
+    liste.addEventListener("click", gererClicPanier);
+    listePanierEcoutee = liste;
+  }
 }
 
 // Crée un bouton d'action pour une ligne du panier.
