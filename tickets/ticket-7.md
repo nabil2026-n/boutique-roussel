@@ -10,7 +10,8 @@ Le cahier des charges fixe un maximum de **150 caractères**, car la carte mesur
 
 ## 3. Test réalisé
 
-Dans le navigateur, avec l'option « Carte » activée, un message dépassant 150 caractères a été saisi.
+1. Activer l'option « Carte » dans le formulaire de composition.
+2. Saisir un message dépassant 150 caractères.
 
 ## 4. Résultat observé
 
@@ -24,7 +25,15 @@ Le comportement actuel respecte la limite de 150 caractères prévue dans le cah
 
 La demande de suppression de la limite est refusée. Le fonctionnement existant est conservé. Aucun changement de code n'est nécessaire.
 
-## 7. Réponse à Madame Roussel
+## 7. Prompt et hypothèses de diagnostic
+
+Aucun prompt de diagnostic distinct ni aucune liste d'hypothèses proposées par l'IA ne sont disponibles dans l'historique de ce ticket. Ils ne sont pas reconstitués.
+
+## 8. Proposition écartée et justification
+
+La demande de suppression de la limite est écartée au regard de la règle métier du cahier des charges, qui fixe un maximum de 150 caractères pour une carte de 8 × 5 cm. Le test navigateur confirme que le comportement actuel respecte cette règle. L'historique ne documente pas d'autre proposition de l'IA rejetée ou modifiée.
+
+## 9. Réponse proposée à Madame Roussel
 
 Bonjour Madame Roussel,
 

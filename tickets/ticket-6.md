@@ -12,13 +12,21 @@ La livraison reste facturée **5,90 €** alors que le sous-total affiché est d
 
 ## 3. Diagnostic et hypothèses examinées
 
-Les éléments du code indiquaient que :
+### Prompt de diagnostic retrouvé
 
-- le seuil de gratuité est chargé depuis `data/livraison.json`;
-- `fraisLivraison()` compare le montant reçu au seuil;
-- `app.js` calcule le sous-total, calcule séparément une éventuelle remise, puis transmet le sous-total à `fraisLivraison()`.
+Le prompt suivant est disponible dans l'historique de l'échange :
 
-**Hypothèse examinée :** le sous-total affiché à deux décimales pourrait être légèrement inférieur à 60 en valeur numérique, en raison de la précision des nombres décimaux JavaScript. Cette hypothèse a été vérifiée dans le navigateur.
+> Analyse le Ticket 6 : le sous-total affiché est de 60,00 €, mais la livraison reste facturée 5,90 €. Le résultat attendu est une livraison gratuite dès 60,00 €, y compris exactement 60,00 €.
+>
+> Examine notamment `js/livraison.js`, `js/app.js` et les données de livraison. Propose plusieurs hypothèses, vérifie comment le seuil est comparé et si le calcul utilise le montant avant ou après remise, puis identifie la cause la plus probable avec les lignes concernées. Ne modifie aucun fichier et ne propose pas encore de correction.
+
+Cette citation restitue la demande de diagnostic disponible; elle n'est pas présentée comme une transcription garantie mot pour mot.
+
+### Hypothèses examinées
+
+- **Précision des nombres décimaux :** le montant numérique pourrait être légèrement inférieur à 60 malgré l'affichage à deux décimales. C'était l'explication avancée et la valeur a été vérifiée dans la console, mais les relevés consignés sont contradictoires (voir ci-dessous).
+- **Montant après remise :** cette piste a été examinée dans le code. `app.js` calcule le sous-total, calcule la remise séparément et transmet le sous-total avant remise à `fraisLivraison()`. Le calcul après remise n'explique donc pas le comportement décrit dans le code consulté.
+- **Seuil ou zone de livraison :** le code et `data/livraison.json` ont été examinés : le seuil est 60 € et la zone de Tours inclut `37000` avec 5,90 € de frais.
 
 ## 4. Vérifications effectuées
 
@@ -29,19 +37,15 @@ Les éléments du code indiquaient que :
 - `js/prix.js`, dans `sousTotal()`, additionne les prix des lignes du panier.
 - `js/app.js`, dans `rafraichir()`, passe à `fraisLivraison()` la variable `montant`, calculée avant la remise. La remise est calculée séparément.
 
-### Fait vérifié dans le navigateur
+### Information rapportée sur la vérification navigateur
 
-Avec un sous-total affiché de **60,00 €**, l'expression `montant.toPrecision(17)` a retourné :
+L'historique contient un relevé rapporté par la cliente : avec deux articles, la valeur observée de `montant` était `119.99999999999999`, décrite comme environ `59.999999999999995 €` par article.
 
-```text
-59.999999999999993
-```
-
-Cette valeur est strictement inférieure à `60`.
+La fiche précédente mentionnait aussi `59.999999999999993` comme résultat de `montant.toPrecision(17)` pour un sous-total affiché de 60,00 €. Cette valeur précise n'est pas étayée par le relevé rapporté dans l'historique. Les deux valeurs ne sont pas cohérentes entre elles; il n'est donc pas possible de retenir une valeur numérique exacte sous 60 comme fait vérifié. Le relevé à `119.99999999999999` est supérieur à 60 et, à lui seul, ne confirme pas l'échec de `montant >= 60`.
 
 ## 5. Cause racine
 
-La représentation des nombres décimaux en JavaScript peut produire une valeur légèrement différente du montant attendu. Dans ce cas, le montant interne était `59.999999999999993`, même si l'interface affichait `60,00 €`. La comparaison directe avec le seuil `60` échouait donc.
+La précision des nombres décimaux JavaScript a été identifiée comme cause possible et a motivé la correction au centime. Toutefois, les données disponibles ne confirment pas précisément que la valeur transmise lors du symptôme était inférieure à 60 : le relevé chiffré consigné dans l'historique est contradictoire avec la valeur précédemment inscrite dans cette fiche. La cause numérique exacte du cas de reproduction reste donc à confirmer.
 
 ## 6. Correction appliquée
 
@@ -68,4 +72,18 @@ Les tests suivants ont été effectués et réussis :
 
 ## 9. Décision technique
 
-La comparaison au centime près corrige l'effet de précision observé au seuil sans modifier le seuil métier ni l'utilisation du sous-total avant remise. Les autres règles de livraison restent inchangées.
+La comparaison au centime près est la correction appliquée pour traiter l'effet de précision signalé, sans modifier le seuil métier ni l'utilisation du sous-total avant remise. L'historique ne documente pas de proposition alternative de l'IA rejetée ou modifiée pour ce ticket.
+
+## 10. Réponse proposée à Madame Roussel
+
+Bonjour Madame Roussel,
+
+Nous avons vérifié le calcul de la livraison gratuite au seuil de 60 €. Une difficulté de précision dans le calcul informatique a été identifiée comme une cause possible, et le calcul a été adapté pour comparer les montants au centime. Le seuil reste fixé à 60 €, et il est toujours évalué avant l'application d'une remise.
+
+Bien cordialement,
+
+L'équipe de la boutique
+
+## 11. Éléments restant à confirmer
+
+La valeur exacte de `montant` lors du cas qui affichait 60,00 € n'est pas établie de façon cohérente dans l'historique. La fiche ne peut donc pas confirmer à partir des informations disponibles que cette valeur était précisément inférieure à 60 avant la correction.
