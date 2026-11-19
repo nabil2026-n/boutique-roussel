@@ -8,7 +8,7 @@ export function afficherCatalogue(bouquets, occasion, surChoix) {
   const liste = document.querySelector("#liste-bouquets");
   liste.replaceChildren();
   bouquets
-    .filter((bouquet) => occasion === "toutes" || bouquet.occasions.includes(occasion))
+    .filter((bouquet) => occasion === "toutes" || bouquet.occasions.some((id) => id.toLowerCase() === occasion.toLowerCase()))
     .forEach((bouquet) => {
       const carte = creer("li", "flex flex-col gap-2 rounded-lg bg-roussel-vert-clair p-4");
       carte.append(
